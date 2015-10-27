@@ -11,6 +11,27 @@ Below is a short description of the tables that are used and their purpose:
 * **collections**: Represents pcdm:Collection
 * **coll_colls**: Represents the recursive pcdm:hasMember in pcdm:Collection
 * **works**: Represents pcdm:Object (avoided using Object since it's a reserved word in Ruby)
+* **works_works**: Represents the recursive pcdm:hasMember in pcdm:Object
+* **pcdmfiles**: Represents pcdm:File (avoided using File since it's a reserved word in Ruby)
+
+```
+         --------------
+    ---- | collections|-------
+    |    --------------      |
+    |       |                |
+    |       |                |
+   /|\     /|\              /|\
+   ------------           -----------
+   |coll_colls|        ---|  works  | -----|
+   ------------        |  -----------      |
+                       |      |            |
+                       |      |            |
+                      /|\    /|\          /|\
+                    -------------     ------------
+                    |work_works |     |pcdmfiles |
+                    -------------     ------------
+
+```
 
 
 ## To get started
@@ -23,25 +44,46 @@ bundle install
 bundle exec rails console
 ```
 
-## A simple demo
-From the rails console
+## Simple demo
+The following Ruby steps show to mimic the representation of the The Raven as described in Andrew Woods' [PCDM-F4 in Action](
+https://wiki.duraspace.org/display/FEDORA4x/LDP-PCDM-F4+In+Action)
 
 ```
-# Create a few sample collections
-master = Collection.create(title:"Books collection")
-red = Collection.create(title:"Red Books collection")
-blue = Collection.create(title:"Blue Books collection")
-color = Collection.create(title:"Books by Color collection")
-small = Collection.create(title:"Small Books collection")
+poe = Collection.create(title:"Books by Edgar Allan Poe")
+raven = Work.create(title:"The Raven", collection: poe)
 
-# Make all collections part of the books collection
-CollColl.create(order:1, collection:master, has_member:red)
-CollColl.create(order:2, collection:master, has_member:blue)
-CollColl.create(order:3, collection:master, has_member:color)
-CollColl.create(order:5, collection:master, has_member:small)
+# Create a work with two files for the cover
+cover = Work.create(title:"Cover of The Raven")
+Pcdmfile.create(name:"cover.pdf", size: 50, url: "http://fedora/rest/raven/cover.pdf", work: cover)
+Pcdmfile.create(name:"cover.jpg", size: 50, url: "http://fedora/rest/raven/cover.jpg", work: cover)
 
-# Make the red and blue collection part of the books by color collection
-CollColl.create(order:1, collection:color, has_member:red)
-CollColl.create(order:2, collection:color, has_member:blue)
+# Create a work with one file for page 1
+page1 = Work.create(title:"Page 1 of The Raven")
+Pcdmfile.create(name:"page1.txt", size: 50, url: "http://fedora/rest/raven/page1.txt", work: page1)
+
+# Create a work with three files for page 2
+page2 = Work.create(title:"Page 2 of The Raven")
+Pcdmfile.create(name:"page2.txt", size: 50, url: "http://fedora/rest/raven/page2.txt", work: page2)
+Pcdmfile.create(name:"page2.pdf", size: 50, url: "http://fedora/rest/raven/page2.pdf", work: page2)
+Pcdmfile.create(name:"page2_thumb.jpg", size: 50, url: "http://fedora/rest/raven/page2_thumb.jpg", work: page2)
+
+# Link the cover and page1/page to the Raven
+WorkWork.create(parent: raven, child: cover)
+WorkWork.create(parent: raven, child: page1)
+WorkWork.create(parent: raven, child: page2)
+
+# Fetch Poe's collection
+poe = Collection.find_by_title("Books by Edgar Allan Poe")
+raven = poe.works.first
+
+# Display Raven's information
+puts "Work: #{raven.title}"
+raven.works.each do |proxy|
+  child = proxy.child
+  puts "\tincludes work: #{child.title}"
+  child.files.each do |file|
+    puts "\t\tincludes file: #{file.name}"
+  end
+end
 ```
 
