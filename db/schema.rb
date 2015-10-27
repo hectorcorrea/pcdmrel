@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151023195209) do
+ActiveRecord::Schema.define(version: 20151027190039) do
 
   create_table "coll_colls", force: :cascade do |t|
     t.integer  "order",                limit: 4
@@ -25,6 +25,13 @@ ActiveRecord::Schema.define(version: 20151023195209) do
     t.string   "title",      limit: 255
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+  end
+
+  create_table "work_works", force: :cascade do |t|
+    t.integer  "parent_work_id", limit: 4
+    t.integer  "child_work_id",  limit: 4
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
   end
 
   create_table "works", force: :cascade do |t|

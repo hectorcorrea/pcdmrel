@@ -14,5 +14,10 @@ cc = CollColl.create(parent:by_size, child:small)
 cc = CollColl.create(parent:by_color, child:red)
 cc = CollColl.create(parent:by_color, child:blue)
 
+# Print collections associated to "Book by size"
+by_size = Collection.find_by_title("Books by size")
+by_size.collections.each { |cc| puts cc.child.title }
 
-
+# There is probably a better way in Rails make automate
+# the mapping of the parent/child in the proxy object
+# (CollColl) to a collection.
