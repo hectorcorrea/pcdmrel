@@ -14,11 +14,11 @@
 ActiveRecord::Schema.define(version: 20151023195209) do
 
   create_table "coll_colls", force: :cascade do |t|
-    t.integer  "order",         limit: 4
-    t.integer  "collection_id", limit: 4
-    t.integer  "has_member_id", limit: 4
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
+    t.integer  "order",                limit: 4
+    t.integer  "parent_collection_id", limit: 4
+    t.integer  "child_collection_id",  limit: 4
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
   end
 
   create_table "collections", force: :cascade do |t|

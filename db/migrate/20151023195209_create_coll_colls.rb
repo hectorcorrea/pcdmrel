@@ -2,8 +2,8 @@ class CreateCollColls < ActiveRecord::Migration
   def change
     create_table :coll_colls do |t|
       t.integer :order
-      t.integer :collection_id
-      t.integer :has_member_id
+      t.integer :parent_collection_id
+      t.integer :child_collection_id
 
       t.timestamps null: false
     end
